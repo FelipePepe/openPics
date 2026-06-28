@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { SearchBar } from '#/components/SearchBar'
 import { AssetGrid } from '#/components/AssetGrid'
@@ -9,23 +9,29 @@ export const Route = createFileRoute('/search')({
     q: String(search.q ?? ''),
     ratio: (search.ratio as AspectRatio) ?? 'square',
     count: Math.min(Math.max(Number(search.count ?? 4), 1), 4),
+    promptIds: String(search.promptIds ?? ''),
   }),
   component: SearchPage,
 })
 
 function SearchPage() {
-  const { q, ratio, count } = Route.useSearch()
-  const [promptIds, setPromptIds] = useState<string[]>([])
+  const { q, ratio, count, promptIds: urlPromptIds } = Route.useSearch()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const promptIds = urlPromptIds ? urlPromptIds.split(',') : []
+
+  function setPromptIds(ids: string[]) {
+    navigate({ to: '/search', search: (prev) => ({ ...prev, promptIds: ids.join(',') }), replace: true })
+  }
+
   useEffect(() => {
-    if (!q) return
+    if (!q || urlPromptIds) return
 
     const controller = new AbortController()
     setLoading(true)
     setError(null)
-    setPromptIds([])
 
     fetch('/api/generate', {
       method: 'POST',
@@ -44,7 +50,7 @@ function SearchPage() {
       .finally(() => setLoading(false))
 
     return () => controller.abort()
-  }, [q, ratio, count])
+  }, [q, ratio, count, urlPromptIds])
 
   return (
     <main className="page-wrap px-4 pb-12">

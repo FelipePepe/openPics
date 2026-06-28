@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { Upload, Clapperboard } from 'lucide-react'
 import { SearchBar } from '#/components/SearchBar'
@@ -7,6 +7,7 @@ import { VideoCard } from '#/components/VideoCard'
 export const Route = createFileRoute('/video')({
   validateSearch: (search: Record<string, unknown>) => ({
     q: String(search.q ?? ''),
+    promptId: String(search.promptId ?? ''),
     imageFilename: String(search.imageFilename ?? ''),
     imageSubfolder: String(search.imageSubfolder ?? ''),
     imageType: String(search.imageType ?? 'output'),
@@ -58,27 +59,31 @@ const VIDEO_PROMPTS = [
 ]
 
 function VideoPage() {
-  const { q, imageFilename, imageSubfolder, imageType } = Route.useSearch()
-  const [promptId, setPromptId] = useState<string | null>(null)
+  const { q, promptId: urlPromptId, imageFilename, imageSubfolder, imageType } = Route.useSearch()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [motionPrompt, setMotionPrompt] = useState('')
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const promptId = urlPromptId || null
   const isI2V = Boolean(imageFilename)
   const imageSrc = isI2V
     ? `/api/image?filename=${encodeURIComponent(imageFilename)}&subfolder=${encodeURIComponent(imageSubfolder)}&type=${encodeURIComponent(imageType)}`
     : null
 
-  // T2V: auto-submit when q is set
+  function setPromptId(id: string) {
+    navigate({ to: '/video', search: (prev) => ({ ...prev, promptId: id }), replace: true })
+  }
+
+  // T2V: auto-submit when q is set and no promptId yet
   useEffect(() => {
-    if (!q || isI2V) return
+    if (!q || isI2V || urlPromptId) return
 
     const controller = new AbortController()
     setLoading(true)
     setError(null)
-    setPromptId(null)
 
     fetch('/api/video/generate', {
       method: 'POST',
@@ -95,14 +100,13 @@ function VideoPage() {
       .finally(() => setLoading(false))
 
     return () => controller.abort()
-  }, [q, isI2V])
+  }, [q, isI2V, urlPromptId])
 
   // I2V: manual submit (user optionally adds motion prompt first)
   function handleAnimate() {
     if (!imageFilename) return
     setLoading(true)
     setError(null)
-    setPromptId(null)
 
     fetch('/api/video/generate-from-image', {
       method: 'POST',
