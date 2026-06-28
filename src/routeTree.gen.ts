@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiImageRouteImport } from './routes/api/image'
 import { Route as ApiHistoryRouteImport } from './routes/api/history'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
+import { Route as ApiEnhancePromptRouteImport } from './routes/api/enhance-prompt'
 import { Route as ApiVideoUploadImageRouteImport } from './routes/api/video/upload-image'
 import { Route as ApiVideoGenerateFromImageRouteImport } from './routes/api/video/generate-from-image'
 import { Route as ApiVideoGenerateRouteImport } from './routes/api/video/generate'
@@ -64,6 +65,11 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
   path: '/api/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEnhancePromptRoute = ApiEnhancePromptRouteImport.update({
+  id: '/api/enhance-prompt',
+  path: '/api/enhance-prompt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiVideoUploadImageRoute = ApiVideoUploadImageRouteImport.update({
   id: '/api/video/upload-image',
   path: '/api/video/upload-image',
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
   '/video': typeof VideoRoute
+  '/api/enhance-prompt': typeof ApiEnhancePromptRoute
   '/api/generate': typeof ApiGenerateRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/image': typeof ApiImageRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
   '/video': typeof VideoRoute
+  '/api/enhance-prompt': typeof ApiEnhancePromptRoute
   '/api/generate': typeof ApiGenerateRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/image': typeof ApiImageRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
   '/video': typeof VideoRoute
+  '/api/enhance-prompt': typeof ApiEnhancePromptRoute
   '/api/generate': typeof ApiGenerateRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/image': typeof ApiImageRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/search'
     | '/video'
+    | '/api/enhance-prompt'
     | '/api/generate'
     | '/api/history'
     | '/api/image'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/search'
     | '/video'
+    | '/api/enhance-prompt'
     | '/api/generate'
     | '/api/history'
     | '/api/image'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/library'
     | '/search'
     | '/video'
+    | '/api/enhance-prompt'
     | '/api/generate'
     | '/api/history'
     | '/api/image'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   LibraryRoute: typeof LibraryRoute
   SearchRoute: typeof SearchRoute
   VideoRoute: typeof VideoRoute
+  ApiEnhancePromptRoute: typeof ApiEnhancePromptRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
   ApiHistoryRoute: typeof ApiHistoryRoute
   ApiImageRoute: typeof ApiImageRoute
@@ -271,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/enhance-prompt': {
+      id: '/api/enhance-prompt'
+      path: '/api/enhance-prompt'
+      fullPath: '/api/enhance-prompt'
+      preLoaderRoute: typeof ApiEnhancePromptRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/video/upload-image': {
       id: '/api/video/upload-image'
       path: '/api/video/upload-image'
@@ -322,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryRoute: LibraryRoute,
   SearchRoute: SearchRoute,
   VideoRoute: VideoRoute,
+  ApiEnhancePromptRoute: ApiEnhancePromptRoute,
   ApiGenerateRoute: ApiGenerateRoute,
   ApiHistoryRoute: ApiHistoryRoute,
   ApiImageRoute: ApiImageRoute,

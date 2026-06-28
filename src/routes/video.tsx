@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { Upload, Clapperboard } from 'lucide-react'
+import { Upload, Clapperboard, Sparkles } from 'lucide-react'
 import { SearchBar } from '#/components/SearchBar'
 import { VideoCard } from '#/components/VideoCard'
 
@@ -64,6 +64,7 @@ function VideoPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [motionPrompt, setMotionPrompt] = useState('')
+  const [enhancingMotion, setEnhancingMotion] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -125,6 +126,25 @@ function VideoPage() {
       })
       .catch(() => setError('Failed to connect to ComfyUI'))
       .finally(() => setLoading(false))
+  }
+
+  async function handleEnhanceMotion() {
+    const q = motionPrompt.trim()
+    if (!q || enhancingMotion) return
+    setEnhancingMotion(true)
+    try {
+      const res = await fetch('/api/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: q, type: 'video' }),
+      })
+      const data = await res.json()
+      if (data.enhanced) setMotionPrompt(data.enhanced)
+    } catch {
+      // silently fail
+    } finally {
+      setEnhancingMotion(false)
+    }
   }
 
   // PC upload → navigate to I2V setup
@@ -248,9 +268,22 @@ function VideoPage() {
                   rows={4}
                   className="w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] outline-none focus:border-[var(--lagoon)] focus:ring-2 focus:ring-[var(--lagoon)]/20"
                 />
-                <p className="mt-1.5 text-xs text-[var(--sea-ink-soft)] opacity-70">
-                  Leave empty to let Wan2.2 decide the motion automatically.
-                </p>
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-xs text-[var(--sea-ink-soft)] opacity-70">
+                    Leave empty to let Wan2.2 decide automatically.
+                  </p>
+                  {motionPrompt.trim() && (
+                    <button
+                      type="button"
+                      onClick={handleEnhanceMotion}
+                      disabled={enhancingMotion}
+                      className="flex items-center gap-1.5 rounded-xl border border-[var(--chip-line)] bg-[var(--chip-bg)] px-2.5 py-1.5 text-xs font-medium text-[var(--sea-ink-soft)] transition hover:border-[var(--lagoon)] hover:text-[var(--sea-ink)] disabled:opacity-50"
+                    >
+                      <Sparkles size={12} className={enhancingMotion ? 'animate-spin' : ''} />
+                      {enhancingMotion ? 'Enhancing…' : 'Enhance'}
+                    </button>
+                  )}
+                </div>
               </div>
 
               {error && (
