@@ -29,13 +29,13 @@ function modelLoader(model: string, blockSwapNode: string) {
 function schedulerHigh() {
   return {
     class_type: 'WanVideoSchedulerv2',
-    inputs: { scheduler: 'unipc', steps: 20, shift: 5.0, start_step: 0, end_step: 10 },
+    inputs: { scheduler: 'euler', steps: 20, shift: 8.0, start_step: 0, end_step: 10 },
   }
 }
 function schedulerLow() {
   return {
     class_type: 'WanVideoSchedulerv2',
-    inputs: { scheduler: 'unipc', steps: 20, shift: 5.0, start_step: 10, end_step: -1 },
+    inputs: { scheduler: 'euler', steps: 20, shift: 8.0, start_step: 10, end_step: -1 },
   }
 }
 
@@ -95,7 +95,7 @@ export function buildWanT2VWorkflow(prompt: string, seed: number) {
         image_embeds: ['7', 0],
         text_embeds: ['2', 0],
         scheduler: ['8', 0],
-        cfg: 6.0,
+        cfg: 3.5,
         seed,
         force_offload: true,
       },
@@ -109,7 +109,7 @@ export function buildWanT2VWorkflow(prompt: string, seed: number) {
         image_embeds: ['7', 0],
         text_embeds: ['2', 0],
         scheduler: ['10', 0],
-        cfg: 6.0,
+        cfg: 3.5,
         seed,
         force_offload: true,
         samples: ['9', 0],           // continue from pass 1
@@ -193,7 +193,7 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
         image_embeds: ['9', 0],
         text_embeds: ['2', 0],
         scheduler: ['10', 0],
-        cfg: 6.0,
+        cfg: 3.5,
         seed,
         force_offload: true,
       },
@@ -207,7 +207,7 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
         image_embeds: ['9', 0],
         text_embeds: ['2', 0],
         scheduler: ['12', 0],
-        cfg: 6.0,
+        cfg: 3.5,
         seed,
         force_offload: true,
         samples: ['11', 0],
