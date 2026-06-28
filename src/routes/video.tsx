@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
-import { Upload, Clapperboard, Sparkles } from 'lucide-react'
+import { Upload, Clapperboard, Sparkles, Shuffle } from 'lucide-react'
 import { SearchBar } from '#/components/SearchBar'
 import { VideoCard } from '#/components/VideoCard'
 
@@ -65,6 +65,8 @@ function VideoPage() {
   const [error, setError] = useState<string | null>(null)
   const [motionPrompt, setMotionPrompt] = useState('')
   const [enhancingMotion, setEnhancingMotion] = useState(false)
+  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 2 ** 32))
+  const [resolution, setResolution] = useState<'480p' | '720p'>('720p')
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -117,6 +119,8 @@ function VideoPage() {
         comfyFilename: imageFilename,
         comfySubfolder: imageSubfolder,
         comfyType: imageType,
+        seed,
+        resolution,
       }),
     })
       .then((r) => r.json())
@@ -231,58 +235,128 @@ function VideoPage() {
 
   // ── I2V setup (image selected, not yet generating) ────────────────────────
   if (isI2V && !promptId && !loading) {
+    const MAX_CHARS = 2000
+    const charCount = motionPrompt.length
+
     return (
       <main className="page-wrap px-4 pb-16">
         <div className="mb-8 max-w-2xl">
           <SearchBar defaultValue="" size="compact" navigateTo="/video" />
         </div>
 
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-[var(--sea-ink)]">Animate image</h2>
+            <h2 className="text-xl font-bold text-[var(--sea-ink)]">Animate image</h2>
             <p className="mt-1 text-sm text-[var(--sea-ink-soft)]">
-              Wan2.2 will animate this image into a ~5 second video clip.
+              Wan2.2 14B will animate this image into a short video clip.
             </p>
           </div>
 
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-            {/* Source image preview */}
-            <div className="w-full overflow-hidden rounded-2xl sm:w-64 sm:shrink-0">
-              <img
-                src={imageSrc!}
-                alt="Source image"
-                className="aspect-square w-full object-cover"
-              />
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+            {/* ── Left: source image ────────────────────────────────────── */}
+            <div className="w-full lg:w-72 lg:shrink-0">
+              <div className="overflow-hidden rounded-2xl border border-[var(--line)]">
+                <img
+                  src={imageSrc!}
+                  alt="Source image"
+                  className="aspect-square w-full object-cover"
+                />
+              </div>
+              <p className="mt-2 text-center text-xs text-[var(--sea-ink-soft)] opacity-60">
+                Source image
+              </p>
             </div>
 
-            {/* Controls */}
-            <div className="flex flex-1 flex-col gap-4">
+            {/* ── Right: controls ───────────────────────────────────────── */}
+            <div className="flex flex-1 flex-col gap-5">
+
+              {/* Motion prompt */}
               <div>
-                <label className="mb-2 block text-sm font-medium text-[var(--sea-ink)]">
-                  Motion prompt <span className="font-normal text-[var(--sea-ink-soft)]">(optional)</span>
-                </label>
-                <textarea
-                  value={motionPrompt}
-                  onChange={(e) => setMotionPrompt(e.target.value)}
-                  placeholder="Describe the motion: camera slowly panning left, leaves rustling in the wind, waves gently moving…"
-                  rows={4}
-                  className="w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] outline-none focus:border-[var(--lagoon)] focus:ring-2 focus:ring-[var(--lagoon)]/20"
-                />
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-[var(--sea-ink-soft)] opacity-70">
-                    Leave empty to let Wan2.2 decide automatically.
-                  </p>
+                <div className="mb-2 flex items-center justify-between">
+                  <label className="text-sm font-medium text-[var(--sea-ink)]">
+                    Motion prompt
+                    <span className="ml-1.5 font-normal text-[var(--sea-ink-soft)]">(optional)</span>
+                  </label>
                   {motionPrompt.trim() && (
                     <button
                       type="button"
                       onClick={handleEnhanceMotion}
                       disabled={enhancingMotion}
-                      className="flex items-center gap-1.5 rounded-xl border border-[var(--chip-line)] bg-[var(--chip-bg)] px-2.5 py-1.5 text-xs font-medium text-[var(--sea-ink-soft)] transition hover:border-[var(--lagoon)] hover:text-[var(--sea-ink)] disabled:opacity-50"
+                      className="flex items-center gap-1.5 rounded-xl border border-[var(--chip-line)] bg-[var(--chip-bg)] px-2.5 py-1 text-xs font-medium text-[var(--sea-ink-soft)] transition hover:border-[var(--lagoon)] hover:text-[var(--sea-ink)] disabled:opacity-50"
                     >
-                      <Sparkles size={12} className={enhancingMotion ? 'animate-spin' : ''} />
+                      <Sparkles size={11} className={enhancingMotion ? 'animate-spin' : ''} />
                       {enhancingMotion ? 'Enhancing…' : 'Enhance'}
                     </button>
                   )}
+                </div>
+                <textarea
+                  value={motionPrompt}
+                  onChange={(e) => setMotionPrompt(e.target.value.slice(0, MAX_CHARS))}
+                  placeholder="Describe the motion: camera slowly panning left, leaves rustling in the wind, waves gently moving…"
+                  rows={4}
+                  className="w-full resize-none rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3 text-sm text-[var(--sea-ink)] placeholder:text-[var(--sea-ink-soft)] outline-none focus:border-[var(--lagoon)] focus:ring-2 focus:ring-[var(--lagoon)]/20"
+                />
+                <div className="mt-1.5 flex items-center justify-between">
+                  <p className="text-xs text-[var(--sea-ink-soft)] opacity-60">
+                    Leave empty to let Wan2.2 decide automatically.
+                  </p>
+                  <span className={`text-xs tabular-nums ${charCount > MAX_CHARS * 0.9 ? 'text-amber-500' : 'text-[var(--sea-ink-soft)] opacity-50'}`}>
+                    {charCount}/{MAX_CHARS}
+                  </span>
+                </div>
+              </div>
+
+              {/* Settings row */}
+              <div className="flex flex-wrap gap-4">
+
+                {/* Resolution */}
+                <div className="flex-1 min-w-[140px]">
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--sea-ink-soft)]">Resolution</p>
+                  <div className="flex rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-1">
+                    {(['480p', '720p'] as const).map((r) => (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => setResolution(r)}
+                        className={`flex-1 rounded-lg py-1.5 text-sm font-medium transition ${
+                          resolution === r
+                            ? 'bg-[var(--lagoon-deep)] text-white shadow-sm'
+                            : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'
+                        }`}
+                      >
+                        {r === '480p' ? '480P · Fast' : '720P · Best'}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-xs text-[var(--sea-ink-soft)] opacity-60">
+                    {resolution === '480p' ? '480×480 · ~half VRAM · faster' : '768×768 · full quality'}
+                  </p>
+                </div>
+
+                {/* Seed */}
+                <div className="flex-1 min-w-[140px]">
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--sea-ink-soft)]">Seed</p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={seed}
+                      onChange={(e) => setSeed(Number(e.target.value))}
+                      min={0}
+                      max={2 ** 32 - 1}
+                      className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-2 text-sm tabular-nums text-[var(--sea-ink)] outline-none focus:border-[var(--lagoon)] focus:ring-2 focus:ring-[var(--lagoon)]/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setSeed(Math.floor(Math.random() * 2 ** 32))}
+                      title="Randomize seed"
+                      className="shrink-0 flex items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] p-2 text-[var(--sea-ink-soft)] transition hover:border-[var(--lagoon)] hover:text-[var(--sea-ink)]"
+                    >
+                      <Shuffle size={16} />
+                    </button>
+                  </div>
+                  <p className="mt-1.5 text-xs text-[var(--sea-ink-soft)] opacity-60">
+                    Same seed + prompt = reproducible result
+                  </p>
                 </div>
               </div>
 

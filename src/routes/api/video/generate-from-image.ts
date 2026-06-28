@@ -13,6 +13,8 @@ export const Route = createFileRoute('/api/video/generate-from-image')({
           comfyFilename: string
           comfySubfolder?: string
           comfyType?: string
+          seed?: number
+          resolution?: '480p' | '720p'
         }
 
         const {
@@ -20,6 +22,7 @@ export const Route = createFileRoute('/api/video/generate-from-image')({
           comfyFilename,
           comfySubfolder = '',
           comfyType = 'output',
+          resolution = '720p',
         } = body
 
         if (!comfyFilename) {
@@ -75,11 +78,11 @@ export const Route = createFileRoute('/api/video/generate-from-image')({
           log('video/generate-from-image', `re-uploaded as ${inputFilename}`)
         }
 
-        const seed = Math.floor(Math.random() * 2 ** 32)
+        const seed = body.seed ?? Math.floor(Math.random() * 2 ** 32)
 
         try {
           const promptId = await submitPrompt(
-            buildWanI2VWorkflow(prompt.trim(), seed, inputFilename),
+            buildWanI2VWorkflow(prompt.trim(), seed, inputFilename, resolution),
           )
           log('video/generate-from-image', `submitted I2V promptId=${promptId}`)
           saveJob(promptId, prompt.trim() || 'Image to Video', 'video')

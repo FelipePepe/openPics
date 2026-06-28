@@ -134,8 +134,19 @@ export function buildWanT2VWorkflow(prompt: string, seed: number) {
   }
 }
 
+const I2V_RES = {
+  '480p': { w: 480, h: 480 },
+  '720p': { w: 768, h: 768 },
+} as const
+
 // uploadedFilename must already be in ComfyUI's /input folder
-export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilename: string) {
+export function buildWanI2VWorkflow(
+  prompt: string,
+  seed: number,
+  uploadedFilename: string,
+  resolution: '480p' | '720p' = '720p',
+) {
+  const { w, h } = I2V_RES[resolution]
   return {
     // ── Text encoder ─────────────────────────────────────────────────────────
     '1': {
@@ -167,8 +178,8 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
       class_type: 'WanVideoImageResizeToClosest',
       inputs: {
         image: ['7', 0],
-        generation_width: 768,
-        generation_height: 768,
+        generation_width: w,
+        generation_height: h,
         aspect_ratio_preservation: 'keep_input',
       },
     },
@@ -176,8 +187,8 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
     '9': {
       class_type: 'WanVideoImageToVideoEncode',
       inputs: {
-        width: 768,
-        height: 768,
+        width: w,
+        height: h,
         num_frames: 81,
         noise_aug_strength: 0.0,
         start_latent_strength: 1.0,
