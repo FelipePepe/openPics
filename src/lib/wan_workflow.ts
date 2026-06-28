@@ -79,7 +79,7 @@ export function buildWanT2VWorkflow(prompt: string, seed: number) {
     },
     '4': {
       class_type: 'WanVideoBlockSwap',
-      inputs: { blocks_to_swap: 20, offload_img_emb: false, offload_txt_emb: false },
+      inputs: { blocks_to_swap: 0, offload_img_emb: false, offload_txt_emb: false },
     },
     // ── Two expert models ─────────────────────────────────────────────────────
     '5': modelLoader(WAN_T2V_HIGH, '4'),
@@ -164,7 +164,7 @@ export function buildWanI2VWorkflow(
     },
     '4': {
       class_type: 'WanVideoBlockSwap',
-      inputs: { blocks_to_swap: 20, offload_img_emb: false, offload_txt_emb: false },
+      inputs: { blocks_to_swap: 0, offload_img_emb: false, offload_txt_emb: false },
     },
     // ── Two expert models ─────────────────────────────────────────────────────
     '5': modelLoader(WAN_I2V_HIGH, '4'),
