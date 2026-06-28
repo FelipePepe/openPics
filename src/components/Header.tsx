@@ -21,7 +21,7 @@ export default function Header() {
             className="nav-link"
             activeProps={{ className: 'nav-link is-active' }}
           >
-            Generate
+            Images
           </Link>
           <Link
             to="/video"

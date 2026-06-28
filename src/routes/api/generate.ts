@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { buildFluxWorkflow, type AspectRatio } from '#/lib/workflow'
 import { submitPrompt } from '#/lib/comfyui'
 import { log, err } from '#/lib/logger'
+import { saveJob } from '#/lib/store'
 
 export const Route = createFileRoute('/api/generate')({
   server: {
@@ -33,6 +34,7 @@ export const Route = createFileRoute('/api/generate')({
             ),
           )
           log('generate', `submitted ${clampedCount} prompts`, promptIds)
+          promptIds.forEach((id) => saveJob(id, prompt.trim(), 'image'))
           return Response.json({ promptIds })
         } catch (e) {
           err('generate', 'failed to submit prompts to ComfyUI', e)

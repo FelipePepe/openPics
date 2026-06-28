@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { COMFYUI_URL, buildWanI2VWorkflow } from '#/lib/wan_workflow'
 import { submitPrompt } from '#/lib/comfyui'
 import { log, err } from '#/lib/logger'
+import { saveJob } from '#/lib/store'
 
 export const Route = createFileRoute('/api/video/generate-from-image')({
   server: {
@@ -81,6 +82,7 @@ export const Route = createFileRoute('/api/video/generate-from-image')({
             buildWanI2VWorkflow(prompt.trim(), seed, inputFilename),
           )
           log('video/generate-from-image', `submitted I2V promptId=${promptId}`)
+          saveJob(promptId, prompt.trim() || 'Image to Video', 'video')
           return Response.json({ promptId })
         } catch (e) {
           err('video/generate-from-image', 'failed to submit to ComfyUI', e)

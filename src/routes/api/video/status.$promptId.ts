@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { COMFYUI_URL, extractVideoOutput } from '#/lib/wan_workflow'
 import { err } from '#/lib/logger'
+import { completeJob } from '#/lib/store'
 
 export const Route = createFileRoute('/api/video/status/$promptId')({
   server: {
@@ -38,6 +39,7 @@ export const Route = createFileRoute('/api/video/status/$promptId')({
 
         if (!video) return Response.json({ status: 'pending' })
 
+        completeJob(promptId, [], [video])
         return Response.json({ status: 'complete', video })
       },
     },

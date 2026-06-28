@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { buildWanT2VWorkflow } from '#/lib/wan_workflow'
 import { submitPrompt } from '#/lib/comfyui'
 import { log, err } from '#/lib/logger'
+import { saveJob } from '#/lib/store'
 
 export const Route = createFileRoute('/api/video/generate')({
   server: {
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/api/video/generate')({
             buildWanT2VWorkflow(prompt.trim(), seed),
           )
           log('video/generate', `submitted promptId=${promptId}`)
+          saveJob(promptId, prompt.trim(), 'video')
           return Response.json({ promptId })
         } catch (e) {
           err('video/generate', 'failed to submit to ComfyUI', e)
