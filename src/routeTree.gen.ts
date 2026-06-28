@@ -17,6 +17,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiImageRouteImport } from './routes/api/image'
 import { Route as ApiHistoryRouteImport } from './routes/api/history'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
+import { Route as ApiVideoUploadImageRouteImport } from './routes/api/video/upload-image'
+import { Route as ApiVideoGenerateFromImageRouteImport } from './routes/api/video/generate-from-image'
 import { Route as ApiVideoGenerateRouteImport } from './routes/api/video/generate'
 import { Route as ApiVideoFileRouteImport } from './routes/api/video/file'
 import { Route as ApiStatusPromptIdRouteImport } from './routes/api/status.$promptId'
@@ -62,6 +64,17 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
   path: '/api/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVideoUploadImageRoute = ApiVideoUploadImageRouteImport.update({
+  id: '/api/video/upload-image',
+  path: '/api/video/upload-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVideoGenerateFromImageRoute =
+  ApiVideoGenerateFromImageRouteImport.update({
+    id: '/api/video/generate-from-image',
+    path: '/api/video/generate-from-image',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiVideoGenerateRoute = ApiVideoGenerateRouteImport.update({
   id: '/api/video/generate',
   path: '/api/video/generate',
@@ -95,6 +108,8 @@ export interface FileRoutesByFullPath {
   '/api/status/$promptId': typeof ApiStatusPromptIdRoute
   '/api/video/file': typeof ApiVideoFileRoute
   '/api/video/generate': typeof ApiVideoGenerateRoute
+  '/api/video/generate-from-image': typeof ApiVideoGenerateFromImageRoute
+  '/api/video/upload-image': typeof ApiVideoUploadImageRoute
   '/api/video/status/$promptId': typeof ApiVideoStatusPromptIdRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +124,8 @@ export interface FileRoutesByTo {
   '/api/status/$promptId': typeof ApiStatusPromptIdRoute
   '/api/video/file': typeof ApiVideoFileRoute
   '/api/video/generate': typeof ApiVideoGenerateRoute
+  '/api/video/generate-from-image': typeof ApiVideoGenerateFromImageRoute
+  '/api/video/upload-image': typeof ApiVideoUploadImageRoute
   '/api/video/status/$promptId': typeof ApiVideoStatusPromptIdRoute
 }
 export interface FileRoutesById {
@@ -124,6 +141,8 @@ export interface FileRoutesById {
   '/api/status/$promptId': typeof ApiStatusPromptIdRoute
   '/api/video/file': typeof ApiVideoFileRoute
   '/api/video/generate': typeof ApiVideoGenerateRoute
+  '/api/video/generate-from-image': typeof ApiVideoGenerateFromImageRoute
+  '/api/video/upload-image': typeof ApiVideoUploadImageRoute
   '/api/video/status/$promptId': typeof ApiVideoStatusPromptIdRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +159,8 @@ export interface FileRouteTypes {
     | '/api/status/$promptId'
     | '/api/video/file'
     | '/api/video/generate'
+    | '/api/video/generate-from-image'
+    | '/api/video/upload-image'
     | '/api/video/status/$promptId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +175,8 @@ export interface FileRouteTypes {
     | '/api/status/$promptId'
     | '/api/video/file'
     | '/api/video/generate'
+    | '/api/video/generate-from-image'
+    | '/api/video/upload-image'
     | '/api/video/status/$promptId'
   id:
     | '__root__'
@@ -168,6 +191,8 @@ export interface FileRouteTypes {
     | '/api/status/$promptId'
     | '/api/video/file'
     | '/api/video/generate'
+    | '/api/video/generate-from-image'
+    | '/api/video/upload-image'
     | '/api/video/status/$promptId'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +208,8 @@ export interface RootRouteChildren {
   ApiStatusPromptIdRoute: typeof ApiStatusPromptIdRoute
   ApiVideoFileRoute: typeof ApiVideoFileRoute
   ApiVideoGenerateRoute: typeof ApiVideoGenerateRoute
+  ApiVideoGenerateFromImageRoute: typeof ApiVideoGenerateFromImageRoute
+  ApiVideoUploadImageRoute: typeof ApiVideoUploadImageRoute
   ApiVideoStatusPromptIdRoute: typeof ApiVideoStatusPromptIdRoute
 }
 
@@ -244,6 +271,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/video/upload-image': {
+      id: '/api/video/upload-image'
+      path: '/api/video/upload-image'
+      fullPath: '/api/video/upload-image'
+      preLoaderRoute: typeof ApiVideoUploadImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/video/generate-from-image': {
+      id: '/api/video/generate-from-image'
+      path: '/api/video/generate-from-image'
+      fullPath: '/api/video/generate-from-image'
+      preLoaderRoute: typeof ApiVideoGenerateFromImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/video/generate': {
       id: '/api/video/generate'
       path: '/api/video/generate'
@@ -287,6 +328,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiStatusPromptIdRoute: ApiStatusPromptIdRoute,
   ApiVideoFileRoute: ApiVideoFileRoute,
   ApiVideoGenerateRoute: ApiVideoGenerateRoute,
+  ApiVideoGenerateFromImageRoute: ApiVideoGenerateFromImageRoute,
+  ApiVideoUploadImageRoute: ApiVideoUploadImageRoute,
   ApiVideoStatusPromptIdRoute: ApiVideoStatusPromptIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
-import { X, ChevronLeft, ChevronRight, Download } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, Download, Clapperboard } from 'lucide-react'
 
 export interface LightboxItem {
   src: string
   filename: string
   prompt?: string
   index: number
+  comfyParams?: { filename: string; subfolder: string; type: string }
 }
 
 interface LightboxProps {
@@ -15,9 +16,10 @@ interface LightboxProps {
   onClose: () => void
   onPrev: () => void
   onNext: () => void
+  onAnimate?: (item: LightboxItem) => void
 }
 
-export function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNext }: LightboxProps) {
+export function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNext, onAnimate }: LightboxProps) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
@@ -67,13 +69,24 @@ export function Lightbox({ item, hasPrev, hasNext, onClose, onPrev, onNext }: Li
           {item.prompt && (
             <p className="line-clamp-2 flex-1 text-sm text-white/70">{item.prompt}</p>
           )}
-          <button
-            onClick={handleDownload}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
-          >
-            <Download size={14} />
-            Download
-          </button>
+          <div className="flex shrink-0 items-center gap-2">
+            {onAnimate && (
+              <button
+                onClick={() => onAnimate(item)}
+                className="flex items-center gap-1.5 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
+              >
+                <Clapperboard size={14} />
+                Animate
+              </button>
+            )}
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-1.5 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/20"
+            >
+              <Download size={14} />
+              Download
+            </button>
+          </div>
         </div>
       </div>
 
