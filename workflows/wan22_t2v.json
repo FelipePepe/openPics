@@ -1,0 +1,181 @@
+{
+  "1": {
+    "class_type": "LoadWanVideoT5TextEncoder",
+    "inputs": {
+      "model_name": "umt5-xxl-enc-fp8_e4m3fn-fixed.safetensors",
+      "precision": "fp32",
+      "load_device": "offload_device"
+    }
+  },
+  "2": {
+    "class_type": "WanVideoTextEncode",
+    "inputs": {
+      "positive_prompt": "cherry blossom petals falling in spring wind, slow motion, soft bokeh, 4K cinematic",
+      "negative_prompt": "oversaturated colors, overexposed, static, blurry details, subtitles, artwork, painting, still image, motionless, overall grayish, worst quality, low quality, JPEG compression artifacts, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, static motionless scene, cluttered background, three legs, many people in background, walking backwards",
+      "t5": [
+        "1",
+        0
+      ],
+      "force_offload": true
+    }
+  },
+  "3": {
+    "class_type": "WanVideoVAELoader",
+    "inputs": {
+      "model_name": "wan_2.1_vae.safetensors",
+      "precision": "bf16"
+    }
+  },
+  "4": {
+    "class_type": "WanVideoBlockSwap",
+    "inputs": {
+      "blocks_to_swap": 0,
+      "offload_img_emb": false,
+      "offload_txt_emb": false
+    }
+  },
+  "5": {
+    "class_type": "WanVideoModelLoader",
+    "inputs": {
+      "model": "wan2.2_t2v_high_noise_14B_fp8_scaled.safetensors",
+      "base_precision": "fp16_fast",
+      "quantization": "fp8_e4m3fn_scaled",
+      "load_device": "offload_device",
+      "block_swap_args": [
+        "4",
+        0
+      ]
+    }
+  },
+  "6": {
+    "class_type": "WanVideoModelLoader",
+    "inputs": {
+      "model": "wan2.2_t2v_low_noise_14B_fp8_scaled.safetensors",
+      "base_precision": "fp16_fast",
+      "quantization": "fp8_e4m3fn_scaled",
+      "load_device": "offload_device",
+      "block_swap_args": [
+        "4",
+        0
+      ]
+    }
+  },
+  "7": {
+    "class_type": "WanVideoEmptyEmbeds",
+    "inputs": {
+      "width": 1280,
+      "height": 720,
+      "num_frames": 81
+    }
+  },
+  "8": {
+    "class_type": "WanVideoSchedulerv2",
+    "inputs": {
+      "scheduler": "euler",
+      "steps": 20,
+      "shift": 8.0,
+      "start_step": 0,
+      "end_step": 10
+    }
+  },
+  "9": {
+    "class_type": "WanVideoSamplerv2",
+    "inputs": {
+      "model": [
+        "5",
+        0
+      ],
+      "image_embeds": [
+        "7",
+        0
+      ],
+      "text_embeds": [
+        "2",
+        0
+      ],
+      "scheduler": [
+        "8",
+        0
+      ],
+      "cfg": 3.5,
+      "seed": 12345,
+      "force_offload": true
+    }
+  },
+  "10": {
+    "class_type": "WanVideoSchedulerv2",
+    "inputs": {
+      "scheduler": "euler",
+      "steps": 20,
+      "shift": 8.0,
+      "start_step": 10,
+      "end_step": -1
+    }
+  },
+  "11": {
+    "class_type": "WanVideoSamplerv2",
+    "inputs": {
+      "model": [
+        "6",
+        0
+      ],
+      "image_embeds": [
+        "7",
+        0
+      ],
+      "text_embeds": [
+        "2",
+        0
+      ],
+      "scheduler": [
+        "10",
+        0
+      ],
+      "cfg": 3.5,
+      "seed": 12345,
+      "force_offload": true,
+      "samples": [
+        "9",
+        0
+      ],
+      "add_noise_to_samples": false
+    }
+  },
+  "12": {
+    "class_type": "WanVideoDecode",
+    "inputs": {
+      "vae": [
+        "3",
+        0
+      ],
+      "samples": [
+        "11",
+        0
+      ],
+      "enable_vae_tiling": false,
+      "tile_x": 272,
+      "tile_y": 272,
+      "tile_stride_x": 144,
+      "tile_stride_y": 144
+    }
+  },
+  "13": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "images": [
+        "12",
+        0
+      ],
+      "frame_rate": 24,
+      "loop_count": 0,
+      "filename_prefix": "wan22_t2v",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 19,
+      "save_metadata": false,
+      "trim_to_audio": false,
+      "pingpong": false,
+      "save_output": true
+    }
+  }
+}
