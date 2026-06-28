@@ -11,6 +11,9 @@ const WAN_I2V_HIGH = 'wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors'
 const WAN_I2V_LOW  = 'wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors'
 const WAN_TEXT_ENCODER = 'umt5-xxl-enc-fp8_e4m3fn-fixed.safetensors'
 
+// Official Wan2.2 negative prompt — suppresses static frames, artifacts, bad anatomy
+const WAN_NEGATIVE = '色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走'
+
 // Shared model loader config
 function modelLoader(model: string, blockSwapNode: string) {
   return {
@@ -67,7 +70,7 @@ export function buildWanT2VWorkflow(prompt: string, seed: number) {
     },
     '2': {
       class_type: 'WanVideoTextEncode',
-      inputs: { positive_prompt: prompt, negative_prompt: '', t5: ['1', 0], force_offload: true },
+      inputs: { positive_prompt: prompt, negative_prompt: WAN_NEGATIVE, t5: ['1', 0], force_offload: true },
     },
     // ── VAE & block swap config ───────────────────────────────────────────────
     '3': {
@@ -141,7 +144,7 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
     },
     '2': {
       class_type: 'WanVideoTextEncode',
-      inputs: { positive_prompt: prompt, negative_prompt: '', t5: ['1', 0], force_offload: true },
+      inputs: { positive_prompt: prompt, negative_prompt: WAN_NEGATIVE, t5: ['1', 0], force_offload: true },
     },
     // ── VAE & block swap config ───────────────────────────────────────────────
     '3': {
@@ -164,8 +167,8 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
       class_type: 'WanVideoImageResizeToClosest',
       inputs: {
         image: ['7', 0],
-        generation_width: 1280,
-        generation_height: 720,
+        generation_width: 768,
+        generation_height: 768,
         aspect_ratio_preservation: 'keep_input',
       },
     },
@@ -173,8 +176,8 @@ export function buildWanI2VWorkflow(prompt: string, seed: number, uploadedFilena
     '9': {
       class_type: 'WanVideoImageToVideoEncode',
       inputs: {
-        width: 1280,
-        height: 720,
+        width: 768,
+        height: 768,
         num_frames: 81,
         noise_aug_strength: 0.0,
         start_latent_strength: 1.0,
