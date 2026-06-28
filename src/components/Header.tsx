@@ -24,6 +24,13 @@ export default function Header() {
             Generate
           </Link>
           <Link
+            to="/video"
+            className="nav-link"
+            activeProps={{ className: 'nav-link is-active' }}
+          >
+            Video
+          </Link>
+          <Link
             to="/library"
             className="nav-link"
             activeProps={{ className: 'nav-link is-active' }}

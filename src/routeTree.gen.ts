@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VideoRouteImport } from './routes/video'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as AboutRouteImport } from './routes/about'
@@ -16,8 +17,16 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiImageRouteImport } from './routes/api/image'
 import { Route as ApiHistoryRouteImport } from './routes/api/history'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
+import { Route as ApiVideoGenerateRouteImport } from './routes/api/video/generate'
+import { Route as ApiVideoFileRouteImport } from './routes/api/video/file'
 import { Route as ApiStatusPromptIdRouteImport } from './routes/api/status.$promptId'
+import { Route as ApiVideoStatusPromptIdRouteImport } from './routes/api/video/status.$promptId'
 
+const VideoRoute = VideoRouteImport.update({
+  id: '/video',
+  path: '/video',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -53,9 +62,24 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
   path: '/api/generate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVideoGenerateRoute = ApiVideoGenerateRouteImport.update({
+  id: '/api/video/generate',
+  path: '/api/video/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVideoFileRoute = ApiVideoFileRouteImport.update({
+  id: '/api/video/file',
+  path: '/api/video/file',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiStatusPromptIdRoute = ApiStatusPromptIdRouteImport.update({
   id: '/api/status/$promptId',
   path: '/api/status/$promptId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiVideoStatusPromptIdRoute = ApiVideoStatusPromptIdRouteImport.update({
+  id: '/api/video/status/$promptId',
+  path: '/api/video/status/$promptId',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -64,20 +88,28 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
+  '/video': typeof VideoRoute
   '/api/generate': typeof ApiGenerateRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/image': typeof ApiImageRoute
   '/api/status/$promptId': typeof ApiStatusPromptIdRoute
+  '/api/video/file': typeof ApiVideoFileRoute
+  '/api/video/generate': typeof ApiVideoGenerateRoute
+  '/api/video/status/$promptId': typeof ApiVideoStatusPromptIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
+  '/video': typeof VideoRoute
   '/api/generate': typeof ApiGenerateRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/image': typeof ApiImageRoute
   '/api/status/$promptId': typeof ApiStatusPromptIdRoute
+  '/api/video/file': typeof ApiVideoFileRoute
+  '/api/video/generate': typeof ApiVideoGenerateRoute
+  '/api/video/status/$promptId': typeof ApiVideoStatusPromptIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,10 +117,14 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/library': typeof LibraryRoute
   '/search': typeof SearchRoute
+  '/video': typeof VideoRoute
   '/api/generate': typeof ApiGenerateRoute
   '/api/history': typeof ApiHistoryRoute
   '/api/image': typeof ApiImageRoute
   '/api/status/$promptId': typeof ApiStatusPromptIdRoute
+  '/api/video/file': typeof ApiVideoFileRoute
+  '/api/video/generate': typeof ApiVideoGenerateRoute
+  '/api/video/status/$promptId': typeof ApiVideoStatusPromptIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,30 +133,42 @@ export interface FileRouteTypes {
     | '/about'
     | '/library'
     | '/search'
+    | '/video'
     | '/api/generate'
     | '/api/history'
     | '/api/image'
     | '/api/status/$promptId'
+    | '/api/video/file'
+    | '/api/video/generate'
+    | '/api/video/status/$promptId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/library'
     | '/search'
+    | '/video'
     | '/api/generate'
     | '/api/history'
     | '/api/image'
     | '/api/status/$promptId'
+    | '/api/video/file'
+    | '/api/video/generate'
+    | '/api/video/status/$promptId'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/library'
     | '/search'
+    | '/video'
     | '/api/generate'
     | '/api/history'
     | '/api/image'
     | '/api/status/$promptId'
+    | '/api/video/file'
+    | '/api/video/generate'
+    | '/api/video/status/$promptId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,14 +176,25 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   LibraryRoute: typeof LibraryRoute
   SearchRoute: typeof SearchRoute
+  VideoRoute: typeof VideoRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
   ApiHistoryRoute: typeof ApiHistoryRoute
   ApiImageRoute: typeof ApiImageRoute
   ApiStatusPromptIdRoute: typeof ApiStatusPromptIdRoute
+  ApiVideoFileRoute: typeof ApiVideoFileRoute
+  ApiVideoGenerateRoute: typeof ApiVideoGenerateRoute
+  ApiVideoStatusPromptIdRoute: typeof ApiVideoStatusPromptIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/video': {
+      id: '/video'
+      path: '/video'
+      fullPath: '/video'
+      preLoaderRoute: typeof VideoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -185,11 +244,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGenerateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/video/generate': {
+      id: '/api/video/generate'
+      path: '/api/video/generate'
+      fullPath: '/api/video/generate'
+      preLoaderRoute: typeof ApiVideoGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/video/file': {
+      id: '/api/video/file'
+      path: '/api/video/file'
+      fullPath: '/api/video/file'
+      preLoaderRoute: typeof ApiVideoFileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/status/$promptId': {
       id: '/api/status/$promptId'
       path: '/api/status/$promptId'
       fullPath: '/api/status/$promptId'
       preLoaderRoute: typeof ApiStatusPromptIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/video/status/$promptId': {
+      id: '/api/video/status/$promptId'
+      path: '/api/video/status/$promptId'
+      fullPath: '/api/video/status/$promptId'
+      preLoaderRoute: typeof ApiVideoStatusPromptIdRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -200,10 +280,14 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   LibraryRoute: LibraryRoute,
   SearchRoute: SearchRoute,
+  VideoRoute: VideoRoute,
   ApiGenerateRoute: ApiGenerateRoute,
   ApiHistoryRoute: ApiHistoryRoute,
   ApiImageRoute: ApiImageRoute,
   ApiStatusPromptIdRoute: ApiStatusPromptIdRoute,
+  ApiVideoFileRoute: ApiVideoFileRoute,
+  ApiVideoGenerateRoute: ApiVideoGenerateRoute,
+  ApiVideoStatusPromptIdRoute: ApiVideoStatusPromptIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

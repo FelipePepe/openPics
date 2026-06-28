@@ -8,9 +8,10 @@ interface SearchBarProps {
   size?: 'hero' | 'compact'
   ratio?: AspectRatio
   count?: number
+  navigateTo?: '/search' | '/video'
 }
 
-export function SearchBar({ defaultValue = '', size = 'hero', ratio = 'square', count = 4 }: SearchBarProps) {
+export function SearchBar({ defaultValue = '', size = 'hero', ratio = 'square', count = 4, navigateTo = '/search' }: SearchBarProps) {
   const [query, setQuery] = useState(defaultValue)
   const navigate = useNavigate()
 
@@ -18,7 +19,11 @@ export function SearchBar({ defaultValue = '', size = 'hero', ratio = 'square', 
     e.preventDefault()
     const q = query.trim()
     if (!q) return
-    navigate({ to: '/search', search: { q, ratio, count } })
+    if (navigateTo === '/video') {
+      navigate({ to: '/video', search: { q } })
+    } else {
+      navigate({ to: '/search', search: { q, ratio, count } })
+    }
   }
 
   const isHero = size === 'hero'
