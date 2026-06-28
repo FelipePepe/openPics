@@ -47,7 +47,7 @@ function vhsCombine(framesNode: string) {
     class_type: 'VHS_VideoCombine',
     inputs: {
       images: [framesNode, 0],
-      frame_rate: 16,
+      frame_rate: 24,
       loop_count: 0,
       filename_prefix: 'openPicsVideo',
       format: 'video/h264-mp4',

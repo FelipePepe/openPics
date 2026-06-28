@@ -349,7 +349,7 @@ function VideoPage() {
           </p>
           <div className="flex shrink-0 items-center gap-2 sm:ml-6">
             <span className="rounded-full border border-[var(--line)] px-2.5 py-0.5 text-xs text-[var(--sea-ink-soft)]">1280 × 720</span>
-            <span className="rounded-full border border-[var(--line)] px-2.5 py-0.5 text-xs text-[var(--sea-ink-soft)]">~5 s · 16 fps</span>
+            <span className="rounded-full border border-[var(--line)] px-2.5 py-0.5 text-xs text-[var(--sea-ink-soft)]">~3.4 s · 24 fps</span>
             <span className="rounded-full border border-[var(--line)] px-2.5 py-0.5 text-xs text-[var(--sea-ink-soft)]">
               {isI2V ? 'Wan2.2 I2V' : 'Wan2.2 T2V'}
             </span>
