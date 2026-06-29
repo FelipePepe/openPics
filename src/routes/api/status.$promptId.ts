@@ -7,6 +7,9 @@ export const Route = createFileRoute('/api/status/$promptId')({
   server: {
     handlers: {
       GET: async ({ params }: { params: { promptId: string } }) => {
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.promptId)) {
+          return Response.json({ status: 'error' }, { status: 400 })
+        }
         try {
           const result = await getGenerationStatus(params.promptId)
           if (result.status === 'complete' && result.image) {

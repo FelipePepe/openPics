@@ -8,9 +8,9 @@ export interface GenerationImage {
 }
 
 export interface GenerationStatus {
-  status: 'pending' | 'complete' | 'error'
+  status: 'queued' | 'running' | 'complete' | 'error'
   image?: GenerationImage
-  progress?: number
+  queuePosition?: number
 }
 
 export async function submitPrompt(workflow: object): Promise<string> {
@@ -41,6 +41,29 @@ export async function submitPrompt(workflow: object): Promise<string> {
   return data.prompt_id as string
 }
 
+async function getQueueStatus(promptId: string): Promise<GenerationStatus> {
+  const url = `${COMFYUI_URL}/queue`
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return { status: 'error' }
+    const queue = await res.json() as {
+      queue_running: [number, string, ...unknown[]][]
+      queue_pending: [number, string, ...unknown[]][]
+    }
+    if (queue.queue_running.some(([, id]) => id === promptId)) {
+      return { status: 'running' }
+    }
+    const pendingIdx = queue.queue_pending.findIndex(([, id]) => id === promptId)
+    if (pendingIdx !== -1) {
+      return { status: 'queued', queuePosition: pendingIdx + 1 }
+    }
+    return { status: 'error' }
+  } catch (e) {
+    err('comfyui', `Cannot reach ComfyUI /queue`, e)
+    return { status: 'error' }
+  }
+}
+
 export async function getGenerationStatus(
   promptId: string,
 ): Promise<GenerationStatus> {
@@ -56,13 +79,13 @@ export async function getGenerationStatus(
 
   if (!res.ok) {
     err('comfyui', `GET /history/${promptId} failed`, { status: res.status })
-    return { status: 'pending' }
+    return getQueueStatus(promptId)
   }
 
   const history = await res.json()
   const entry = history[promptId]
 
-  if (!entry) return { status: 'pending' }
+  if (!entry) return getQueueStatus(promptId)
 
   const outputs = entry.outputs
   const nodeOutputs = outputs ? Object.values(outputs) : []
@@ -74,7 +97,7 @@ export async function getGenerationStatus(
     }
   }
 
-  return { status: 'pending' }
+  return getQueueStatus(promptId)
 }
 
 export function getImageProxyUrl(image: GenerationImage): string {
